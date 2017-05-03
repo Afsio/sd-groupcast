@@ -3,6 +3,7 @@ from printer import Printer
 from group import Group
 from member import Member
 from pyactor.context import set_context, create_host, sleep, shutdown
+from random import choice
 
 
 if __name__ == '__main__':
@@ -13,22 +14,30 @@ if __name__ == '__main__':
 
     g = h.spawn('group', Group, [3, p])
 
-    p1 = h.spawn('p1', Member, [g, p])
-    p2 = h.spawn('p2', Member, [g, p])
-    p3 = h.spawn('p3', Member, [g, p])
+    members = []
 
-    g.join(p1)
-    g.join(p2)
-    g.join(p3)
+    for i in xrange(20):
+        new_member = h.spawn('m'+str(i), Member, [g, p])
+        g.join(new_member)
+        members.append(new_member)
 
     g.init_start()
 
-    p.printmsg(g.get_members())
+    for i in xrange(20):
+        member = choice(members)
+        member.multicast("Hi" + str(i) +  " ")
+        print "Multicasting " + str(i)
+        sleep(1)
 
-    sleep(5)
-    g.announce(p1)
-    sleep(12)
+    for member in members:
+        p.printmsg(member.get_id() + ": " + ''.join(member.get_message()))
 
-    p.printmsg(g.get_members())
+    # p.printmsg(g.get_members())
+    #
+    # sleep(5)
+    # g.announce(p1)
+    # sleep(12)
+    #
+    # p.printmsg(g.get_members())
 
     shutdown()

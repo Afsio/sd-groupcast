@@ -15,9 +15,12 @@ class Group(object):
         self.group = {}
         self.n = n
         self.printer = printer
+        self.sequencer = None
 
     def join(self, member_ref):
         self.group[member_ref] = 10
+        if self.sequencer == None:
+            self.sequencer = member_ref
 
     def leave(self, member_ref):
         self.group.pop(member_ref)
@@ -31,7 +34,7 @@ class Group(object):
     def update_membertime(self):
         for member in self.group.keys():
             self.group[member] -= 1
-            self.printer.printmsg(member.get_id() + " " + str(self.group[member]))
+            # self.printer.printmsg(member.get_id() + " " + str(self.group[member]))
             if self.group[member] == 0:
                 self.group.pop(member)
                 # self.printer.printmsg(member.get_id() + " left!")
