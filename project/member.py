@@ -8,13 +8,12 @@ from pyactor.context import sleep
 
 class Member(object):
     _tell = ["multicast", "receive"]
-    _ask = ["get_message"]
+    _ask = ["get_message", "get_queue"]
 
-    def __init__(self, group, printer, delay):
+    def __init__(self, group, printer, delay=0):
         self.group = group
         self.printer = printer
         self.queue = []
-        self.message = []
         self.delay = delay
 
     def multicast(self, message):
@@ -26,6 +25,8 @@ class Member(object):
     def receive(self, message, seq):
         self.queue.append((message, seq))
 
+    def get_queue(self):
+        return self.queue
+
     def get_message(self):
-        #TODO: update to msg
         return sorted(self.queue, key=lambda tup: tup[1])

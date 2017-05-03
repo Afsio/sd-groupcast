@@ -18,8 +18,6 @@ if __name__ == '__main__':
 
     g.attach_sequencer(s)
 
-    delay = 0
-
     members = []
 
     for i in xrange(10):
@@ -28,29 +26,24 @@ if __name__ == '__main__':
         elif i == 7:
             new_member = h.spawn('m'+str(i), Member, [g, p, 0.7])
         else:
-            new_member = h.spawn('m'+str(i), Member, [g, p, delay])
+            new_member = h.spawn('m'+str(i), Member, [g, p])
         g.join(new_member)
         members.append(new_member)
 
     g.init_start()
 
     for member in members:
-    #for i in xrange(10):
-        # member = choice(members)
         member.multicast("Hi" + str(i) +  " ")
-        print "Multicasting " + str(i)
-        #sleep(0.5)
+        print "Multicasting message."
 
-    sleep(4)
+    sleep(2)
+
+    for member in members:
+        p.printmsg(member.get_id() + ": " + ''.join(str(member.get_queue())))
+
+    p.printmsg("======================================================")
+
     for member in members:
         p.printmsg(member.get_id() + ": " + ''.join(str(member.get_message())))
-
-    # p.printmsg(g.get_members())
-    #
-    # sleep(5)
-    # g.announce(p1)
-    # sleep(12)
-    #
-    # p.printmsg(g.get_members())
 
     shutdown()
