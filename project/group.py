@@ -1,23 +1,25 @@
 '''
 Arnau Montanes
 Christian Zanger
-01/05/2017 version 0.2
+01/05/2017 version 0.3
 '''
 
 from pyactor.context import interval
 
 class Group(object):
     _tell = ["join", "leave", "init_start", "update_membertime", "announce", "attach_sequencer"]
-    _ask = ["get_members", "get_sequencer"]
+    _ask = ["get_members", "get_sequencer", "get_members_ids"]
 
     def __init__(self, n, printer):
         self.group = {}
         self.n = n
         self.printer = printer
         self.sequencer = None
+        self.ids = []
 
-    def join(self, member_ref):
+    def join(self, member_ref, iden=0):
         self.group[member_ref] = 30
+        self.ids.append(iden)
 
     def leave(self, member_ref):
         self.group.pop(member_ref)
@@ -30,6 +32,9 @@ class Group(object):
 
     def get_sequencer(self):
         return self.sequencer
+
+    def get_members_ids(self):
+        return self.ids
 
     def init_start(self):
         self.time = interval(self.host, 1, self.proxy, "update_membertime")
