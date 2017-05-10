@@ -44,7 +44,7 @@ def lamport():
     members = []
     ids = []
 
-    for i in xrange(10):
+    for i in xrange(4):
         iden = 'm'+str(i)
         ids.append(iden)
         new_member = h.spawn(iden, LamportMember, [g, p, iden])
@@ -60,8 +60,8 @@ def lamport():
         print "Multicasting message."
         sleep(1)
 
-    #for member in members:
-    #    p.printmsg(member.get_id() + ": " + ''.join(str(member.get_queue())))
+    for member in members:
+        p.printmsg(member.get_id() + ": " + ''.join(str(member.get_queue())))
 
     p.printmsg("======================================================")
 
