@@ -13,6 +13,7 @@ def sequencer():
 
     members = []
 
+    #Simulate delay for peer3 and peer7
     for i in xrange(10):
         if i == 3:
             new_member = h.spawn('m'+str(i), Member, [g, p, 0.5])
@@ -56,9 +57,12 @@ def lamport():
     j = 0
     for member in members:
         member.multicast("Hi" + str(j) +  " ")
-        j = j+1
+        j += 1
         print "Multicasting message."
         sleep(1)
+
+    members[0].multicast("HOLA?")
+    sleep(1)
 
     for member in members:
         p.printmsg(member.get_id() + ": " + ''.join(str(member.get_queue())))
@@ -89,4 +93,5 @@ if __name__ == '__main__':
 
     sleep(1)
     print 'Exiting demo...'
+    sleep(1)
     shutdown()
