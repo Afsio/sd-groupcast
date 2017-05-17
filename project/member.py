@@ -1,16 +1,15 @@
 '''
 Arnau Montanes
 Christian Zanger
-01/05/2017 version 0.3.1
+01/05/2017 version 0.5
 '''
 
-from pyactor.context import sleep
-#TODO: implement process msg
+from pyactor.context import sleep, interval, serve_forever
 
 class Member(object):
     #TODO: implement bully leader election
-    _tell = ["multicast", "receive"]
-    _ask = ["get_message", "get_queue"]
+    _tell = ['multicast', 'receive']
+    _ask = ['get_message', 'get_queue']
 
     def __init__(self, group, printer, delay=0):
         self.group = group
@@ -35,8 +34,8 @@ class Member(object):
         return sorted(self.queue, key=lambda tup: tup[1])
 
 class LamportMember(Member):
-    _tell = ["multicast", "receive", "process_msg"]
-    _ask = ["get_message", "get_queue"]
+    _tell = ['multicast', 'receive', 'process_msg', 'process_msg']
+    _ask = ['get_message', 'get_queue']
 
     def __init__(self, group, printer, identifier):
         self.group = group
@@ -45,7 +44,6 @@ class LamportMember(Member):
         self.message = []
         self.clock = 0
         self.iden = identifier
-        self.num_mes = 0
         self.curr_acks = 0
 
     def multicast(self, message):
@@ -54,33 +52,36 @@ class LamportMember(Member):
             member.receive(message, self.clock, self.iden)
 
     def receive(self, message, ts, iden):
-        # self.printer.printmsg(self.proxy.get_id() + " received: (" + message + "," + str(ts) + ") clock: " + str(self.clock))
+        # self.printer.printmsg(self.proxy.get_id() + ' received: (' + message + ',' + str(ts) + ') clock: ' + str(self.clock))
         self.clock = max(self.clock, ts) + 1
-        if message != "ACK":
-            self.printer.printmsg(self.proxy.get_id() + " received MESSAGE")
+        if message != 'ACK':
+            # self.printer.printmsg(self.proxy.get_id() + ' received MESSAGE')
             #If m recieved, append to queue and sort according to timestamp
             self.queue.append((message, self.clock, iden))
             self.queue.sort(key=lambda tup: tup[1])
-            self.num_mes += 1
             #Then, ack everybody
-            self.multicast("ACK")
+            self.multicast('ACK')
         else:
-            nmembers = self.group.get_members()
+            # self.printer.printmsg(self.proxy.get_id() + ' received ACK' + str(self.curr_acks ) + ' from ' + iden)
+            future = self.group.get_members(future=True)
+            future.add_callback('process_ack')
+
+    def process_ack(self, future):
             #When ack recieved, append to queue and sort according to timestamp
-            self.curr_acks += 1
-            self.printer.printmsg(self.proxy.get_id() + " received ACK" + str(self.curr_acks ) + " from " + iden)
-            self.queue.append(("ACK", self.clock, iden))
+            self.queue.append(('ACK', self.clock))
             self.queue.sort(key=lambda tup: tup[1])
 
-            # self.printer.printmsg(self.curr_acks)
+            # nmembers = len(self.group.get_members())
+            nmembers = len(future.result())
+            self.curr_acks += 1
 
-            if self.curr_acks == len(nmembers):
+            if self.curr_acks == nmembers:
                 #All ACKS received, it's safe to process the message
                 self.process_msg(self.queue[0])
                 #Delete message from queue and the corresponding ACKS
                 self.curr_acks = 0
                 self.queue.pop(0)
-                for i in range(len(nmembers)):
+                for i in range(nmembers):
                     self.queue.pop(0)
 
     def process_msg(self, msg):
@@ -88,3 +89,9 @@ class LamportMember(Member):
 
     def get_message(self):
         return self.message
+
+class Monitor(LamportMember):
+
+    def process_msg(self, msg):
+        self.message.append(msg)
+        self.printer.printmsg(msg[2] + ": " + msg[0])

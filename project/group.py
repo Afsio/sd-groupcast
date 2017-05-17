@@ -1,14 +1,15 @@
 '''
 Arnau Montanes
 Christian Zanger
-01/05/2017 version 0.3
+01/05/2017 version 0.5
 '''
 
 from pyactor.context import interval
 
 class Group(object):
-    _tell = ["join", "leave", "init_start", "update_membertime", "announce", "attach_sequencer"]
-    _ask = ["get_members", "get_sequencer", "get_members_ids"]
+    _tell = ['join', 'leave', 'init_start', 'update_membertime', 'announce', 'attach_sequencer', 'monitor']
+    _ask = ['get_members', 'get_sequencer', 'get_members_ids']
+    _ref = ['join', 'leave', 'attach_sequencer', 'get_sequencer', 'announce', 'get_members']
 
     def __init__(self, n, printer):
         self.group = {}
@@ -37,15 +38,15 @@ class Group(object):
         return self.ids
 
     def init_start(self):
-        self.time = interval(self.host, 1, self.proxy, "update_membertime")
+        self.time = interval(self.host, 1, self.proxy, 'update_membertime')
 
     def update_membertime(self):
         for member in self.group.keys():
             self.group[member] -= 1
-            # self.printer.printmsg(member.get_id() + " " + str(self.group[member]))
+            # self.printer.printmsg(member.get_id() + ' ' + str(self.group[member]))
             if self.group[member] == 0:
+                self.printer.printmsg(member.get_id() + ' left!')
                 self.group.pop(member)
-                # self.printer.printmsg(member.get_id() + " left!")
 
     def announce(self, member_ref):
         self.group[member_ref] = 30
