@@ -1,0 +1,14 @@
+language: python
+python:
+- '2.7'
+install:
+- pip install -r requirements.txt
+script:
+- find ./project -name \*.py -exec pep8 --ignore=E402 {} +
+- nosetests -v --with-coverage --cover-erase --cover-package=gotorrent
+after_success:
+- bash <(curl -s https://codecov.io/bash)
+notifications:
+  email: false
+  slack:
+    secure: oxP0k76F7/xgx1kNdVr5KQLLbHK5TAvDWo+nvgzjatwKIy89Pw0K86lCT8Li3NhvzBFV4b3f8ceiBoD4QufVlamCrX3S26bmhOJqViSrExQp3qWumXDpfYMiETpP6IevjRt/DSbGVTMI//k8uj1kJE82X+zrmaXIdTZTM6JX1Ufx/seeMPSFyy3El1t3rglKycdnHQaryfjVKj1KbT0KfYDX+ACmgtrMMuGKmTshETLDTsUaOnVa9IhqWZmVpYMUTXwozxRszyqT7dRdTMzCgqyt8OQ2/A0deqDXpZSH6L+0bmLKjt7xrR2arMapsTqYkp6cwUjUzT5VsbInPN4qIqAlFlHzF1VtWWrZ7UzRgKFSkF7esmKEjNW5LKz44CLsOFQdBH1Jfums+eMyW+0+Ic4szKdXtCgXiFZizySsUnhMHGFxp8EwnMHCiufGMgkMNjd/EIxnIHQxl2QJfbZGR5iKxx/NfVP/UGudoYPA3HhYzyZN44D8v7JjhJj9DTU30eh9yaRLRcfdGb8gZ2TArdDRwaTGh0ifbGX8tWEc16VLUq0icj6ZLbZc5gpuKevS26ZEV4M3JM3VXSrNJjjOFfUfMsnsd+IXvmg9ENJGxoA9DBQHO2MdyY3gaJ1NW2ROp0w56VziKhvATjwf9Q6i/dJYAmiAQKKMU+CPjRDtokQ=

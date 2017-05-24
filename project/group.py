@@ -1,38 +1,45 @@
 '''
 Arnau Montanes
 Christian Zanger
-01/05/2017 version 0.5
+01/05/2017 version 0.7
 '''
 
 from pyactor.context import interval
 
 class Group(object):
-    _tell = ['join', 'leave', 'init_start', 'update_membertime', 'announce', 'attach_sequencer', 'monitor']
+    _tell = ['join', 'leave', 'init_start', 'update_membertime', 'announce', 'attach_sequencers', 'monitor', 'update_coordinator', 'announce']
     _ask = ['get_members', 'get_sequencer', 'get_members_ids']
     _ref = ['join', 'leave', 'attach_sequencer', 'get_sequencer', 'announce', 'get_members']
 
-    def __init__(self, n, printer):
+    def __init__(self, printer):
         self.group = {}
-        self.n = n
         self.printer = printer
-        self.sequencer = None
+        self.coordinator = None
+        self.sequenfcers = []
         self.ids = []
 
     def join(self, member_ref, iden=0):
         self.group[member_ref] = 30
-        self.ids.append(iden)
+        # self.ids.append(iden)
+        self.ids.append(member_ref.get_id())
 
     def leave(self, member_ref):
         self.group.pop(member_ref)
 
+    def announce(self, member_ref):
+        self.group[member_ref] = 30
+
     def get_members(self):
         return self.group.keys()
 
-    def attach_sequencer(self, seq):
-        self.sequencer = seq
+    def attach_sequencers(self, seq):
+        self.sequencers = seq
 
     def get_sequencer(self):
-        return self.sequencer
+        return self.coordinator
+
+    def update_coordinator(self, c):
+        self.coordinator = self.sequencers[c]
 
     def get_members_ids(self):
         return self.ids
@@ -46,7 +53,7 @@ class Group(object):
             # self.printer.printmsg(member.get_id() + ' ' + str(self.group[member]))
             if self.group[member] == 0:
                 self.printer.printmsg(member.get_id() + ' left!')
-                self.group.pop(member)
+                self.group.leave(member)
 
     def announce(self, member_ref):
         self.group[member_ref] = 30

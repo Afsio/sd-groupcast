@@ -1,43 +1,70 @@
 '''
 Arnau Montanes
 Christian Zanger
-01/05/2017 version 0.5
+01/05/2017 version 0.7
 '''
 
 from pyactor.context import sleep, interval, serve_forever
 
 class Member(object):
-    #TODO: implement bully leader election
-    _tell = ['multicast', 'receive']
+    _tell = ['multicast', 'receive', 'process_msg', 'process_queue', 'init_start', 'announce']
     _ask = ['get_message', 'get_queue']
 
-    def __init__(self, group, printer, delay=0):
+    def __init__(self, group, printer, delay=0, monitor=False):
         self.group = group
         self.printer = printer
         self.queue = []
+        self.message = []
         self.delay = delay
+        self.monitor = monitor
         self.cur_acks = 0
+
+    def init_start(self):
+         self.time_announce = interval(self.host, 10, self.proxy, 'announce')
+
+    def stop_announce(self):
+        self.time_announce.set()
+
+    def announce(self):
+        self.group.announce(self)
 
     def multicast(self, message):
         ts = self.group.get_sequencer().timestamp()
         sleep(self.delay)
+        self.printer.printmsg("Multicasting message " + message)
         for member in self.group.get_members():
             member.receive(message, ts)
 
-    def receive(self, message, seq):
-        self.queue.append((message, seq))
+    def process_queue(self, message, ts):
+        if len(self.message) == 0:
+            #Message empty, we expect a ts of 0
+            if ts == 0:
+                self.process_msg(self.queue[0])
+                self.queue.pop(0)
+        elif ts == self.message[-1][1] + 1:
+            self.queue = sorted(self.queue, key=lambda tup: tup[1])
+            self.process_msg(self.queue[0])
+            self.queue.pop(0)
+            if len(self.queue) != 0:
+                self.process_queue(self.queue[0][0], self.queue[0][1])
+
+    def receive(self, message, ts):
+        self.queue.append((message, ts))
+        self.process_queue(message, ts)
+
+    def process_msg(self, msg):
+        if self.monitor: self.printer.printmsg(msg)
+        self.message.append(msg)
 
     def get_queue(self):
         return self.queue
 
     def get_message(self):
-        return sorted(self.queue, key=lambda tup: tup[1])
+        return self.message
 
 class LamportMember(Member):
-    _tell = ['multicast', 'receive', 'process_msg', 'process_msg']
-    _ask = ['get_message', 'get_queue']
 
-    def __init__(self, group, printer, identifier):
+    def __init__(self, group, printer, identifier, monitor=False):
         self.group = group
         self.printer = printer
         self.queue = []
@@ -45,6 +72,7 @@ class LamportMember(Member):
         self.clock = 0
         self.iden = identifier
         self.curr_acks = 0
+        self.monitor = monitor
 
     def multicast(self, message):
         self.clock += 1
@@ -83,15 +111,3 @@ class LamportMember(Member):
                 self.queue.pop(0)
                 for i in range(nmembers):
                     self.queue.pop(0)
-
-    def process_msg(self, msg):
-        self.message.append(msg)
-
-    def get_message(self):
-        return self.message
-
-class Monitor(LamportMember):
-
-    def process_msg(self, msg):
-        self.message.append(msg)
-        self.printer.printmsg(msg[2] + ": " + msg[0])
