@@ -4,7 +4,7 @@ python:
 install:
 - pip install -r requirements.txt
 script:
-- find ./project -name \*.py -exec pep8 --ignore=E402 {} +
+- find ./project -name \*_s.py -exec pep8 --ignore=E402 {} +
 - nosetests -v --with-coverage --cover-erase --cover-package=gotorrent
 after_success:
 - bash <(curl -s https://codecov.io/bash)
