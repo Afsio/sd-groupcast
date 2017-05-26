@@ -20,18 +20,19 @@ class Member(object):
         self.cur_acks = 0
 
     def init_start(self):
-         self.time_announce = interval(self.host, 10, self.proxy, 'announce')
+         self.time_announce = interval(self.host, 6, self.proxy, 'announce')
 
     def stop_announce(self):
         self.time_announce.set()
 
     def announce(self):
-        self.group.announce(self)
+        # self.printer.printmsg("Announcing")
+        self.group.announce("LELELEL")
 
     def multicast(self, message):
         ts = self.group.get_sequencer().timestamp()
         sleep(self.delay)
-        self.printer.printmsg("Multicasting message " + message)
+        # self.printer.printmsg("Multicasting message " + message)
         for member in self.group.get_members():
             member.receive(message, ts)
 

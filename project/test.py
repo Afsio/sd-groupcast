@@ -31,11 +31,11 @@ def sequencer():
 
     g.init_start()
 
-    for member in members:
+    for member in g.get_members():
         member.init_start()
 
     j = 0
-    for member in members:
+    for member in g.get_members():
         member.multicast("Hi" + str(j))
         j += 1
         print "Multicasting message " + str(j)
@@ -43,17 +43,13 @@ def sequencer():
 
     sleep(3)
 
-    for member in members:
+    for member in g.get_members():
         p.printmsg(member.get_id() + ": " + ''.join(str(member.get_queue())))
 
     p.printmsg("======================================================")
 
     for member in members:
         p.printmsg(member.get_id() + ": " + ''.join(str(member.get_message())))
-
-    p.printmsg(g.get_members_ids())
-
-
 
 def lamport():
     members = []
@@ -67,6 +63,10 @@ def lamport():
         members.append(new_member)
 
     g.init_start()
+
+    #TODO: ola k ase?
+    # for member in members:
+    #     member.init_start()
 
 
     j = 0

@@ -6,10 +6,13 @@ Christian Zanger
 
 from pyactor.context import interval
 
+
 class Group(object):
-    _tell = ['join', 'leave', 'init_start', 'update_membertime', 'announce', 'attach_sequencers', 'monitor', 'update_coordinator', 'announce']
+    _tell = ['join', 'leave', 'init_start', 'update_membertime', 'announce',
+             'attach_sequencers', 'monitor', 'update_coordinator', 'announce']
     _ask = ['get_members', 'get_sequencer', 'get_members_ids']
-    _ref = ['join', 'leave', 'attach_sequencer', 'get_sequencer', 'announce', 'get_members']
+    _ref = ['join', 'leave', 'attach_sequencer', 'get_sequencer', 'announce',
+            'get_members']
 
     def __init__(self, printer):
         self.group = {}
@@ -19,7 +22,7 @@ class Group(object):
         self.ids = []
 
     def join(self, member_ref, iden=0):
-        self.group[member_ref] = 30
+        self.group[member_ref] = 10
         # self.ids.append(iden)
         self.ids.append(member_ref.get_id())
 
@@ -27,7 +30,10 @@ class Group(object):
         self.group.pop(member_ref)
 
     def announce(self, member_ref):
-        self.group[member_ref] = 30
+        if member_ref in self.group:
+            self.printer.printmsg("hola")
+        # self.printer.printmsg(member_ref + " announced." )
+        # self.group[member_ref] = 30
 
     def get_members(self):
         return self.group.keys()
@@ -50,10 +56,6 @@ class Group(object):
     def update_membertime(self):
         for member in self.group.keys():
             self.group[member] -= 1
-            # self.printer.printmsg(member.get_id() + ' ' + str(self.group[member]))
             if self.group[member] == 0:
                 self.printer.printmsg(member.get_id() + ' left!')
-                self.group.leave(member)
-
-    def announce(self, member_ref):
-        self.group[member_ref] = 30
+                self.leave(member)
