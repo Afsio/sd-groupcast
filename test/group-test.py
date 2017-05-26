@@ -1,7 +1,7 @@
 import unittest
-from project import group
-from project import printer
-from project import member
+from project import group_s
+from project import printer_s
+from project import member_s
 from pyactor.context import set_context, create_host, shutdown, sleep
 
 class TestGroup(unittest.TestCase):

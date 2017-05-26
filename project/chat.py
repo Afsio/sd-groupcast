@@ -1,7 +1,8 @@
-from pyactor.context import set_context, create_host, serve_forever, shutdown, sleep
-from group import Group
-from member import Member, LamportMember
-from printer import Printer
+from pyactor.context import set_context, create_host, serve_forever, sleep
+from group_s import Group
+from member_s import Member, LamportMember
+from printer_s import Printer
+
 
 def sequencer():
     members = []
@@ -11,11 +12,13 @@ def sequencer():
         g.join(new_member)
         members.append(new_member)
 
+
 def lamport():
     members = []
 
     for i in xrange(1):
-        new_member = h.spawn('Remote'+str(i), LamportMember, [g, p, 'Remote'+str(i), True])
+        new_id = 'Remote'+str(i)
+        new_member = h.spawn(new_id, LamportMember, [g, p, new_id, True])
         g.join(new_member)
         members.append(new_member)
 

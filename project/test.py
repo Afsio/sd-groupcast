@@ -1,7 +1,7 @@
-from printer import Printer
-from group import Group
-from sequencer import Sequencer, BullySequencer
-from member import Member, LamportMember
+from printer_s import Printer
+from group_s import Group
+from sequencer_s import Sequencer, BullySequencer
+from member_s import Member, LamportMember
 from pyactor.context import set_context, create_host, sleep, shutdown
 from random import choice
 
@@ -64,10 +64,8 @@ def lamport():
 
     g.init_start()
 
-    #TODO: ola k ase?
-    # for member in members:
-    #     member.init_start()
-
+    for member in members:
+        member.init_start()
 
     j = 0
     for member in members:
