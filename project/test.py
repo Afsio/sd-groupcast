@@ -53,12 +53,10 @@ def sequencer():
 
 def lamport():
     members = []
-    ids = []
 
     for i in xrange(5):
         iden = 'm'+str(i)
-        ids.append(iden)
-        new_member = h.spawn(iden, LamportMember, [g, p, iden])
+        new_member = h.spawn(iden, LamportMember, [g, p])
         g.join(new_member, iden)
         members.append(new_member)
 

@@ -67,20 +67,19 @@ class Member(object):
 
 class LamportMember(Member):
 
-    def __init__(self, group, printer, identifier, monitor=False):
+    def __init__(self, group, printer, monitor=False):
         self.group = group
         self.printer = printer
         self.queue = []
         self.message = []
         self.clock = 0
-        self.iden = identifier
         self.curr_acks = 0
         self.monitor = monitor
 
     def multicast(self, message):
         self.clock += 1
         for member in self.group.get_members():
-            member.receive(message, self.clock, self.iden)
+            member.receive(message, self.clock, self.proxy.get_id())
 
     def receive(self, message, ts, iden):
         self.clock = max(self.clock, ts) + 1
@@ -100,7 +99,6 @@ class LamportMember(Member):
             self.queue.append(('ACK', self.clock))
             self.queue.sort(key=lambda tup: tup[1])
 
-            # nmembers = len(self.group.get_members())
             nmembers = len(future.result())
             self.curr_acks += 1
 
