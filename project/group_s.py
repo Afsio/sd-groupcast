@@ -9,7 +9,7 @@ from pyactor.context import interval
 
 class Group(object):
     _tell = ['join', 'leave', 'init_start', 'update_membertime', 'announce',
-             'attach_sequencers', 'monitor', 'update_coordinator', 'announce']
+             'attach_sequencers', 'monitor', 'update_coordinator']
     _ask = ['get_members', 'get_sequencer', 'get_members_ids']
     _ref = ['join', 'leave', 'attach_sequencer', 'get_sequencer', 'announce',
             'get_members']
@@ -18,7 +18,7 @@ class Group(object):
         self.group = {}
         self.printer = printer
         self.coordinator = None
-        self.sequenfcers = []
+        self.sequencers = []
         self.ids = []
 
     def join(self, member_ref, iden=0):
