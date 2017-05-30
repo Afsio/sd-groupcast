@@ -61,7 +61,10 @@ class Member(object):
 
     def process_msg(self, msg):
         if self.monitor:
-            self.printer.printmsg(msg[2] + ": " + msg[0])
+            if len(msg) == 3:
+                self.printer.printmsg(msg[2] + ": " + msg[0])
+            else:
+                self.printer.printmsg(msg)
         self.message.append(msg)
 
     def get_queue(self):
