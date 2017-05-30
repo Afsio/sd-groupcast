@@ -28,7 +28,7 @@ class Member(object):
         self.time_announce.set()
 
     def announce(self):
-        self.group.announce(self)
+        self.group.announce(self.proxy)
 
     def multicast(self, message):
         ts = self.group.get_sequencer().timestamp()
@@ -55,7 +55,7 @@ class Member(object):
 
     def process_msg(self, msg):
         if self.monitor:
-            self.printer.printmsg(msg)
+            self.printer.printmsg(msg[2] + ": " + msg[0])
         self.message.append(msg)
 
     def get_queue(self):

@@ -7,18 +7,17 @@ from printer_s import Printer
 def sequencer():
     members = []
 
-    for i in xrange(1):
+    for i in xrange(3):
         new_member = h.spawn('Remote'+str(i), Member, [g, p, 0, True])
         g.join(new_member)
         members.append(new_member)
 
-
 def lamport():
     members = []
 
-    for i in xrange(1):
+    for i in xrange(3):
         new_id = 'Remote'+str(i)
-        new_member = h.spawn(new_id, LamportMember, [g, p, new_id, True])
+        new_member = h.spawn(new_id, LamportMember, [g, p, True])
         g.join(new_member)
         members.append(new_member)
 

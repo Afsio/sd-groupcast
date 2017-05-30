@@ -31,25 +31,25 @@ def sequencer():
 
     g.init_start()
 
-    for member in g.get_members():
+    for member in members:
         member.init_start()
 
     j = 0
     for member in g.get_members():
         member.multicast("Hi" + str(j))
-        j += 1
         print "Multicasting message " + str(j)
+        j += 1
         sleep(0.2)
 
     sleep(3)
 
     for member in g.get_members():
-        p.printmsg(member.get_id() + ": " + ''.join(str(member.get_queue())))
+        p.printmsg(member.get_url()[22:] + ": " + ''.join(str(member.get_queue())))
 
     p.printmsg("======================================================")
 
-    for member in members:
-        p.printmsg(member.get_id() + ": " + ''.join(str(member.get_message())))
+    for member in g.get_members():
+        p.printmsg(member.get_url()[22:] + ": " + ''.join(str(member.get_message())))
 
 def lamport():
     members = []
@@ -66,19 +66,19 @@ def lamport():
         member.init_start()
 
     j = 0
-    for member in members:
+    for member in g.get_members():
         member.multicast("Hi" + str(j) +  " ")
-        j += 1
         print "Multicasting message."
+        j += 1
         sleep(1)
 
-    for member in members:
-        p.printmsg(member.get_id() + ": " + ''.join(str(member.get_queue())))
+    for member in g.get_members():
+        p.printmsg(member.get_url()[22:] + ": " + ''.join(str(member.get_queue())))
 
     p.printmsg("======================================================")
 
-    for member in members:
-        p.printmsg(member.get_id() + ": " + ''.join(str(member.get_message())))
+    for member in g.get_members():
+        p.printmsg(member.get_url()[22:] + ": " + ''.join(str(member.get_message())))
 
 if __name__ == '__main__':
     set_context()
