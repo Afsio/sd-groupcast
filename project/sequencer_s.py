@@ -94,7 +94,10 @@ class BullySequencer(Sequencer):
             s.recieve("Recover", self.iden)
 
     def timestamp(self):
-        self.seq += 1
-        for s in self.all:
-            s.recieve("Timestamp", self.seq)
-        return self.seq
+          if self.state != "Failed":
+              self.seq += 1
+              for s in self.all:
+                  s.recieve("Timestamp", self.seq)
+              return self.seq
+          else:
+              raise TimeoutError("Coordinator not responding")

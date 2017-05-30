@@ -5,6 +5,7 @@ Christian Zanger
 '''
 
 from pyactor.context import sleep, interval
+from pyactor.exceptions import TimeoutError
 
 
 class Member(object):
@@ -31,10 +32,15 @@ class Member(object):
         self.group.announce(self.proxy)
 
     def multicast(self, message):
-        ts = self.group.get_sequencer().timestamp()
-        sleep(self.delay)
-        for member in self.group.get_members():
-            member.receive(message, ts)
+          try:
+              ts = self.group.get_sequencer().timestamp()
+              sleep(self.delay)
+              for member in self.group.get_members():
+                  member.receive(message, ts)
+          except TimeoutError:
+              # We are electing, please wait
+              sleep(0.1)
+              self.multicast(message)
 
     def process_queue(self, message, ts):
         if len(self.message) == 0:

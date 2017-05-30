@@ -37,9 +37,12 @@ def sequencer():
     j = 0
     for member in g.get_members():
         member.multicast("Hi" + str(j))
-        print "Multicasting message " + str(j)
+        p.printmsg("Multicasting message " + str(j))
         j += 1
         sleep(0.2)
+        p.printmsg("El coordinador es " + g.get_sequencer().get_url()[22:])
+        if j == 5:
+            s[3].s_fail()
 
     sleep(3)
 
